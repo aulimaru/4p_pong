@@ -25,6 +25,11 @@ class Ball():
         self.y+=self.speed_y
     def render(self):
         pygame.draw.circle(screen,0xffffff,(self.x,self.y),self.radius) # draw the ball on screen
+    def check_collide(self): # unfinished function
+        if(False):
+            return -1
+        return 0
+
 
 
 class Platform():
@@ -45,7 +50,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False # if event type is pygame.QUIT, then quit
     # RENDER YOUR GAME HERE
-
+    ball.move()
+    ball.render()
 
 
     # flip() the display to put your work on screen
