@@ -2,12 +2,23 @@ import pygame
 screen_width = 1280
 screen_height = 720
 screen_size = (screen_width, screen_height)
+import math
+width = 1280
+height = 720
+screen_size = (width, height)
 pygame.init()
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 running = True
 class Ball():
     def __init__(self,x,y,radius):
+        self.speed = 0 # the movement speed of the ball
+        self.direction = 0 # the direction of the ball, using bearing degree
+        self.x = x
+        self.y = y
+        self.radius = radius
+    def move(self):
+        pass
 
 class Platform():
     def __init__(self, x, y, length, height):
