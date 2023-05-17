@@ -1,13 +1,20 @@
 import pygame
-width = 1280
-height = 720
-screen_size = (width, height)
+screen_width = 1280
+screen_height = 720
+screen_size = (screen_width, screen_height)
 pygame.init()
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 running = True
 class Ball():
     def __init__(self,x,y,radius):
+
+class Platform():
+    def __init__(self, x, y, length, height):
+        self.x = x
+        self.y = y
+        self.length = length
+        self.height = height
 
 while running:
     for event in pygame.event.get(): # poll for events, pygame.QUIT event means the user clicked X to close your window
