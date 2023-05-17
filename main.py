@@ -1,7 +1,4 @@
 import pygame
-screen_width = 1280
-screen_height = 720
-screen_size = (screen_width, screen_height)
 import math
 width = 1280
 height = 720
