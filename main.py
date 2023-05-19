@@ -31,15 +31,45 @@ class Ball():
         return 0
 
 
-
 class Platform():
-    def __init__(self, x, y, length, height):
+    def __init__(self, x, y, length, height, movement):
         self.x = x
         self.y = y
         self.length = length
         self.height = height
+        self.bind(movement)
+
+
+    def render(self):
+        pygame.draw.rect(screen, 0xffffff, (self.x, self.y, self.length, self.height))
+
+    def control(self):
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[self.mapping["right"]]:
+            self.x += 5
+        if pressed_keys[self.mapping["left"]]:
+            self.x -= 5
+        if pressed_keys[self.mapping["down"]]:
+            self.y += 5
+        if pressed_keys[self.mapping["up"]]:
+            self.y -= 5
+
+    def bind(self, movement):
+        self.mapping = {"right": False, "left": False, "up": False, "down": None}
+        if movement == "horizontal":
+            self.mapping = {"right": pygame.K_d, "left": pygame.K_a}
+        elif movement == "vertical":
+            self.mapping = {"up": pygame.K_w, "down": pygame.K_s}
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                pass
+
+
+
+
 #set up
 ball = Ball(screen_width/2, screen_height/2,5)
+platform = Platform(200, 200, 50, 50, "vertical")
 
 
 
@@ -52,6 +82,9 @@ while running:
     # RENDER YOUR GAME HERE
     ball.move()
     ball.render()
+    platform.control()
+    platform.render()
+    
 
 
     # flip() the display to put your work on screen
