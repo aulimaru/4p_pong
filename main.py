@@ -1,10 +1,9 @@
 import pygame
 import math
-screen_width = 1280
-screen_height = 720
-screen_size = (screen_width, screen_height)
 pygame.init()
+screen_size = (1280, 720)
 screen = pygame.display.set_mode(screen_size)
+screen_rect = screen.get_rect()
 clock = pygame.time.Clock()
 running = True
 class Ball():
