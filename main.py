@@ -32,58 +32,61 @@ class Ball():
 
 
 class Platform():
-    def __init__(self, x, y, length, height, movement):
-        self.x = x
-        self.y = y
-        self.length = length
-        self.height = height
+    def __init__(self, x, y, width, height, movement):
+        self.platform = pygame.Rect(x, y, width, height)
         self.bind(movement)
-
+        self.speed = 5
 
     def render(self):
-        pygame.draw.rect(screen, 0xffffff, (self.x, self.y, self.length, self.height))
-
-    def control(self):
-        pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[self.mapping["right"]]:
-            self.x += 5
-        if pressed_keys[self.mapping["left"]]:
-            self.x -= 5
-        if pressed_keys[self.mapping["down"]]:
-            self.y += 5
-        if pressed_keys[self.mapping["up"]]:
-            self.y -= 5
+        pygame.draw.rect(screen, 0xffffff, self.platform) 
 
     def bind(self, movement):
-        self.mapping = {"right": False, "left": False, "up": False, "down": None}
         if movement == "horizontal":
-            self.mapping = {"right": pygame.K_d, "left": pygame.K_a}
+            self.mapping = {pygame.K_d: "right", pygame.K_a: "left"}
         elif movement == "vertical":
-            self.mapping = {"up": pygame.K_w, "down": pygame.K_s}
+            self.mapping = {pygame.K_w: "up", pygame.K_s: "down"}
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 pass
 
-
-
+    def control(self):
+        self.direction = ""
+        pressed_keys = pygame.key.get_pressed()
+        for mapping in self.mapping:
+            if pressed_keys[mapping]:
+                self.direction = self.mapping.get(mapping)
+    
+    def move(self):
+        if self.direction == "right":
+            self.platform.x += self.speed
+        elif self.direction == "left":
+            self.platform.x -= self.speed
+        elif self.direction == "up":
+            self.platform.y -= self.speed
+        elif self.direction == "down":
+            self.platform.y += self.speed
 
 #set up
 ball = Ball(screen_width/2, screen_height/2,5)
-platform = Platform(200, 200, 50, 50, "vertical")
+platforms = [Platform(200, 200, 50, 50, "vertical"), Platform(200, 200, 50, 50, "horizontal")]
 
 
 
 
 
 while running:
+    screen.fill(0x000000)
     for event in pygame.event.get(): # poll for events, pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False # if event type is pygame.QUIT, then quit
     # RENDER YOUR GAME HERE
     ball.move()
     ball.render()
-    platform.control()
-    platform.render()
+
+    for platform in platforms:
+        platform.control()
+        platform.move()
+        platform.render()
     
 
 
