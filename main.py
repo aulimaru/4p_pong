@@ -8,6 +8,7 @@ screen_size = (1280, 720)
 screen = pygame.display.set_mode(screen_size)
 screen_rect = screen.get_rect()
 clock = pygame.time.Clock()
+collision_tolerance = 10
 
 
 class Ball():
@@ -39,14 +40,14 @@ class Platform():
         self.rect = pygame.Rect(0, 0, width, height)
         self.rect.center = (x, y)
         self.keymaps = keymaps
-        self.speed = 5
+        self.speed = 10
 
     def render(self):
         pygame.draw.rect(screen, 0xffffff, self.rect)
 
     def control(self):
         # sets direction when key pressed
-        self.direction = ""
+        self.direction = (0, 0)
         pressed_keys = pygame.key.get_pressed()
         for keymap in self.keymaps:
             if pressed_keys[keymap]:
@@ -54,14 +55,14 @@ class Platform():
     
     def move(self):
         # moves platform according to direction
-        if self.direction == "right":
-            self.rect.x += self.speed
-        elif self.direction == "left":
-            self.rect.x -= self.speed
-        elif self.direction == "up":
+        if self.direction == (0, -1):
             self.rect.y -= self.speed
-        elif self.direction == "down":
+        elif self.direction == (0, 1):
             self.rect.y += self.speed
+        elif self.direction == (-1, 0):
+            self.rect.x -= self.speed
+        elif self.direction == (1, 0):
+            self.rect.x += self.speed
 
     def check_collision(self):
         # prevent the platform from going outside screen
@@ -74,14 +75,27 @@ class Platform():
         if self.rect.right > screen_rect.right:
             self.rect.right = screen_rect.right
 
+        # prevent platforms from going inside each other
+        for platform in platforms:
+            if platform.rect.colliderect(self.rect):
+                if abs(self.rect.top - platform.rect.bottom) <= collision_tolerance and self.direction == (0, -1):
+                    self.rect.top = platform.rect.bottom
+                if abs(self.rect.bottom - platform.rect.top) <= collision_tolerance and self.direction == (0, 1):
+                    self.rect.bottom = platform.rect.top
+                if abs(self.rect.left - platform.rect.right) <= collision_tolerance and self.direction == (-1, 0):
+                    self.rect.left = platform.rect.right
+                if abs(self.rect.right - platform.rect.left) <= collision_tolerance and self.direction == (1, 0):
+                    self.rect.right = platform.rect.left
+
+
 
 #set up
 ball = Ball(screen_rect.width/2, screen_rect.height/2,5)
 platforms = [
-        Platform(50, screen_rect.height // 2, 10, 100, {pygame.K_w: "up", pygame.K_s: "down"}),
-        Platform(screen_rect.width - 50, screen_rect.height // 2, 10, 100, {pygame.K_UP: "up", pygame.K_DOWN: "down"}),
-        Platform(screen_rect.width // 2, 50, 100, 10, {pygame.K_a: "left", pygame.K_d: "right"}),
-        Platform(screen_rect.width // 2, screen_rect.height - 50, 100, 10, {pygame.K_LEFT: "left", pygame.K_RIGHT: "right"}),
+        Platform(50, screen_rect.height // 2, 10, 100, {pygame.K_w: (0, -1), pygame.K_s: (0, 1)}),
+        Platform(screen_rect.width - 50, screen_rect.height // 2, 10, 100, {pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}),
+        Platform(screen_rect.width // 2, 50, 100, 10, {pygame.K_a: (-1, 0), pygame.K_d: (1, 0)}),
+        Platform(screen_rect.width // 2, screen_rect.height - 50, 100, 10, {pygame.K_LEFT: (-1, 0), pygame.K_RIGHT: (1, 0)}),
 ]
 
 
