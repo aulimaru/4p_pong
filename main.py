@@ -16,7 +16,6 @@ class Ball():
         self.rect.center = (x, y)
         self.speed_x = 2
         self.speed_y = 2
-        self.collision_tolerance = 2
 
     def move(self):
         self.rect.x += self.speed_x 
@@ -32,13 +31,13 @@ class Ball():
 
         for platform in platforms:
             if platform.rect.colliderect(self.rect):
-                if abs(self.rect.top - platform.rect.bottom) <= self.collision_tolerance:
+                if abs(self.rect.top - platform.rect.bottom) <= collision_tolerance and self.speed_y < 0:
                     self.speed_y = abs(self.speed_y)
-                if abs(self.rect.bottom - platform.rect.top) <= self.collision_tolerance:
+                if abs(self.rect.bottom - platform.rect.top) <= collision_tolerance and self.speed_y > 0:
                     self.speed_y = -abs(self.speed_y)
-                if abs(self.rect.left - platform.rect.right) <= self.collision_tolerance:
+                if abs(self.rect.left - platform.rect.right) <= collision_tolerance and self.speed_x < 0:
                     self.speed_x = abs(self.speed_x)
-                if abs(self.rect.right - platform.rect.left) <= self.collision_tolerance:
+                if abs(self.rect.right - platform.rect.left) <= collision_tolerance and self.speed_x > 0:
                     self.speed_x = -abs(self.speed_x)
 
 
