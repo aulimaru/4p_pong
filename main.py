@@ -1,11 +1,15 @@
 import pygame
 import math
+
+
 pygame.init()
 screen_size = (1280, 720)
 screen = pygame.display.set_mode(screen_size)
 screen_rect = screen.get_rect()
 clock = pygame.time.Clock()
 running = True
+
+
 class Ball():
     def __init__(self,x,y,radius):
         self.speed = 0 # the movement speed of the ball
@@ -84,8 +88,9 @@ platforms = [
 while running:
     screen.fill(0x000000)
     for event in pygame.event.get(): # poll for events, pygame.QUIT event means the user clicked X to close your window
-        if event.type == pygame.QUIT:
-            running = False # if event type is pygame.QUIT, then quit
+        if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            running = False
+
     # RENDER YOUR GAME HERE
     ball.move()
     ball.render()
