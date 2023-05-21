@@ -20,12 +20,12 @@ class Ball():
         self.speed_y = 0
         self.length = length
     def genspeedxy(self):
-        self.speed_x = math.sin(self.direction/180*math.pi)*self.speed # calculate speed_x and speed_y using trigonometry
-        self.speed_y = math.cos(self.direction/180*math.pi)*self.speed
+        self.speed_x = int(math.sin(self.direction/180*math.pi) * self.speed) # calculate speed_x and speed_y using trigonometry
+        self.speed_y = int(math.cos(self.direction/180*math.pi) * self.speed)
     def move(self):
         self.genspeedxy() # regenerate speed_x and speed_y before using them
-        self.ball.x+=self.speed_x # change the pos of ball depend on speed_x and speed_y
-        self.ball.y+=self.speed_y
+        self.ball.x += self.speed_x # change the pos of ball depend on speed_x and speed_y
+        self.ball.y += self.speed_y
     def render(self):
         pygame.draw.rect(screen, 0xffffff, self.ball) # draw the ball on screen
     def check_collide(self, Platform): # unfinished function
