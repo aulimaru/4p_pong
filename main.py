@@ -1,4 +1,5 @@
 import pygame
+import sys
 import math
 
 
@@ -7,7 +8,6 @@ screen_size = (1280, 720)
 screen = pygame.display.set_mode(screen_size)
 screen_rect = screen.get_rect()
 clock = pygame.time.Clock()
-running = True
 
 
 class Ball():
@@ -85,11 +85,12 @@ platforms = [
 ]
 
 
-while running:
+while True:
     screen.fill(0x000000)
     for event in pygame.event.get(): # poll for events, pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            running = False
+            pygame.quit()
+            sys.exit()
 
     # RENDER YOUR GAME HERE
     ball.move()
@@ -106,5 +107,3 @@ while running:
     pygame.display.flip()
 
     clock.tick(60)  # limits FPS to 60
-
-pygame.quit()
