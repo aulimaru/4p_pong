@@ -29,9 +29,7 @@ class Ball():
     def render(self):
         pygame.draw.rect(screen, 0xffffff, self.ball) # draw the ball on screen
     def check_collide(self, Platform): # unfinished function
-        if(False):
-            return -1
-        return 0
+        pass
 
 
 class Platform():
