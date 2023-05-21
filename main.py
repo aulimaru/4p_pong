@@ -31,21 +31,59 @@ class Ball():
         return 0
 
 
-
 class Platform():
-    def __init__(self, x, y, length, height):
-        self.x = x
-        self.y = y
-        self.length = length
-        self.height = height
+    def __init__(self, x, y, width, height, keymaps):
+        self.platform = pygame.Rect(0, 0, width, height)
+        self.platform.center = (x, y)
+        self.keymaps = keymaps
+        self.speed = 5
+
+    def render(self):
+        pygame.draw.rect(screen, 0xffffff, self.platform) 
+
+    def control(self):
+        # sets direction when key pressed
+        self.direction = ""
+        pressed_keys = pygame.key.get_pressed()
+        for keymap in self.keymaps:
+            if pressed_keys[keymap]:
+                self.direction = self.keymaps.get(keymap)
+    
+    def move(self):
+        # moves platform according to direction
+        if self.direction == "right":
+            self.platform.x += self.speed
+        elif self.direction == "left":
+            self.platform.x -= self.speed
+        elif self.direction == "up":
+            self.platform.y -= self.speed
+        elif self.direction == "down":
+            self.platform.y += self.speed
+
+    def collision(self):
+        # prevent the platform from going outside screen
+        if self.platform.x < screen_rect.left:
+            self.platform.x = screen_rect.left
+        if self.platform.x > screen_rect.right - self.platform.width:
+            self.platform.x = screen_rect.right - self.platform.width
+        if self.platform.y < screen_rect.top:
+            self.platform.y = screen_rect.top
+        if self.platform.y > screen_rect.bottom - self.platform.height:
+            self.platform.y = screen_rect.bottom - self.platform.height
+
+
 #set up
-ball = Ball(screen_width/2, screen_height/2,5)
-
-
-
+ball = Ball(screen_rect.width/2, screen_rect.height/2,5)
+platforms = [
+        Platform(50, screen_rect.height // 2, 10, 100, {pygame.K_w: "up", pygame.K_s: "down"}),
+        Platform(screen_rect.width - 50, screen_rect.height // 2, 10, 100, {pygame.K_UP: "up", pygame.K_DOWN: "down"}),
+        Platform(screen_rect.width // 2, 50, 100, 10, {pygame.K_a: "left", pygame.K_d: "right"}),
+        Platform(screen_rect.width // 2, screen_rect.height - 50, 100, 10, {pygame.K_LEFT: "left", pygame.K_RIGHT: "right"}),
+]
 
 
 while running:
+    screen.fill(0x000000)
     for event in pygame.event.get(): # poll for events, pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False # if event type is pygame.QUIT, then quit
@@ -53,6 +91,12 @@ while running:
     ball.move()
     ball.render()
 
+    for platform in platforms:
+        platform.control()
+        platform.move()
+        platform.collision()
+        platform.render()
+    
 
     # flip() the display to put your work on screen
     pygame.display.flip()
