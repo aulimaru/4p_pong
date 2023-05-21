@@ -4,7 +4,7 @@ import math
 
 
 pygame.init()
-screen_size = (1280, 720)
+screen_size = (1000, 1000)
 screen = pygame.display.set_mode(screen_size)
 screen_rect = screen.get_rect()
 clock = pygame.time.Clock()
