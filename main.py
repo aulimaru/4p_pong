@@ -12,7 +12,7 @@ running = True
 
 class Ball():
     def __init__(self,x,y,length):
-        self.speed = 5 # the movement speed of the ball
+        self.speed = 0 # the movement speed of the ball
         self.direction = 0 # the direction of the ball, using bearing degree
         self.ball = pygame.Rect(0,0,length,length)
         self.ball.center=(x,y)
@@ -28,7 +28,6 @@ class Ball():
         self.ball.y+=self.speed_y
     def render(self):
         pygame.draw.rect(screen, 0xffffff, self.ball) # draw the ball on screen
-        pygame.draw.line(screen, 0xffffff, (self.ball.x,self.ball.y),(0,0))
     def check_collide(self, Platform): # unfinished function
         if(False):
             return -1
