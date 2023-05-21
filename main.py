@@ -36,13 +36,13 @@ class Ball():
 
 class Platform():
     def __init__(self, x, y, width, height, keymaps):
-        self.platform = pygame.Rect(0, 0, width, height)
-        self.platform.center = (x, y)
+        self.rect = pygame.Rect(0, 0, width, height)
+        self.rect.center = (x, y)
         self.keymaps = keymaps
         self.speed = 5
 
     def render(self):
-        pygame.draw.rect(screen, 0xffffff, self.platform) 
+        pygame.draw.rect(screen, 0xffffff, self.rect)
 
     def control(self):
         # sets direction when key pressed
@@ -55,24 +55,24 @@ class Platform():
     def move(self):
         # moves platform according to direction
         if self.direction == "right":
-            self.platform.x += self.speed
+            self.rect.x += self.speed
         elif self.direction == "left":
-            self.platform.x -= self.speed
+            self.rect.x -= self.speed
         elif self.direction == "up":
-            self.platform.y -= self.speed
+            self.rect.y -= self.speed
         elif self.direction == "down":
-            self.platform.y += self.speed
+            self.rect.y += self.speed
 
-    def collision(self):
+    def check_collision(self):
         # prevent the platform from going outside screen
-        if self.platform.x < screen_rect.left:
-            self.platform.x = screen_rect.left
-        if self.platform.x > screen_rect.right - self.platform.width:
-            self.platform.x = screen_rect.right - self.platform.width
-        if self.platform.y < screen_rect.top:
-            self.platform.y = screen_rect.top
-        if self.platform.y > screen_rect.bottom - self.platform.height:
-            self.platform.y = screen_rect.bottom - self.platform.height
+        if self.rect.top < screen_rect.top:
+            self.rect.top = screen_rect.top
+        if self.rect.bottom > screen_rect.bottom:
+            self.rect.bottom = screen_rect.bottom
+        if self.rect.left < screen_rect.left:
+            self.rect.left = screen_rect.left
+        if self.rect.right > screen_rect.right:
+            self.rect.right = screen_rect.right
 
 
 #set up
@@ -99,7 +99,7 @@ while True:
     for platform in platforms:
         platform.control()
         platform.move()
-        platform.collision()
+        platform.check_collision()
         platform.render()
     
 
