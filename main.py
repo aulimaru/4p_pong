@@ -2,43 +2,32 @@ import pygame
 import sys
 
 
-pygame.init()
-screen_size = (1000, 1000)
-screen = pygame.display.set_mode(screen_size)
-screen_rect = screen.get_rect()
-clock = pygame.time.Clock()
-collision_tolerance = 10
-
-
 class Ball():
-    def __init__(self,x,y,length):
+    def __init__(self, x, y, length):
         self.rect = pygame.Rect(0, 0, length, length)
         self.rect.center = (x, y)
-        self.speed_x = 2
-        self.speed_y = 2
+        self.velocity = pygame.math.Vector2(2, 5)
 
     def move(self):
-        self.rect.x += self.speed_x 
-        self.rect.y += self.speed_y
+        self.rect.move_ip(self.velocity)
 
     def render(self):
         pygame.draw.rect(screen, 0xffffff, self.rect) # draw the ball on screen
 
-    def check_collision(self):
+    def check_collision(self, platforms):
         if self.rect.top < screen_rect.top or self.rect.bottom > screen_rect.bottom or self.rect.left < screen_rect.left or self.rect.right > screen_rect.right:
-            pass
-            # game_over()
+            main()
 
         for platform in platforms:
             if platform.rect.colliderect(self.rect):
-                if abs(self.rect.top - platform.rect.bottom) <= collision_tolerance and self.speed_y < 0:
-                    self.speed_y = abs(self.speed_y)
-                if abs(self.rect.bottom - platform.rect.top) <= collision_tolerance and self.speed_y > 0:
-                    self.speed_y = -abs(self.speed_y)
-                if abs(self.rect.left - platform.rect.right) <= collision_tolerance and self.speed_x < 0:
-                    self.speed_x = abs(self.speed_x)
-                if abs(self.rect.right - platform.rect.left) <= collision_tolerance and self.speed_x > 0:
-                    self.speed_x = -abs(self.speed_x)
+                if abs(self.rect.top - platform.rect.bottom) <= COLLISION_TOLERANCE:
+                    self.velocity.reflect_ip(UP)
+                if abs(self.rect.bottom - platform.rect.top) <= COLLISION_TOLERANCE:
+                    self.velocity.reflect_ip(DOWN)
+                if abs(self.rect.left - platform.rect.right) <= COLLISION_TOLERANCE:
+                    self.velocity.reflect_ip(LEFT)
+                if abs(self.rect.right - platform.rect.left) <= COLLISION_TOLERANCE:
+                    self.velocity.reflect_ip(RIGHT)
 
 
 class Platform():
@@ -53,7 +42,7 @@ class Platform():
 
     def control(self):
         # sets direction when key pressed
-        self.direction = (0, 0)
+        self.direction = pygame.Vector2(0, 0)
         pressed_keys = pygame.key.get_pressed()
         for keymap in self.keymaps:
             if pressed_keys[keymap]:
@@ -61,16 +50,9 @@ class Platform():
     
     def move(self):
         # moves platform according to direction
-        if self.direction == (0, -1):
-            self.rect.y -= self.speed
-        elif self.direction == (0, 1):
-            self.rect.y += self.speed
-        elif self.direction == (-1, 0):
-            self.rect.x -= self.speed
-        elif self.direction == (1, 0):
-            self.rect.x += self.speed
+        self.rect.move_ip(self.direction * self.speed)
 
-    def check_collision(self):
+    def check_collision(self, platforms):
         # prevent the platform from going outside screen
         if self.rect.top < screen_rect.top:
             self.rect.top = screen_rect.top
@@ -84,47 +66,63 @@ class Platform():
         # prevent platforms from going inside each other
         for platform in platforms:
             if platform.rect.colliderect(self.rect):
-                if abs(self.rect.top - platform.rect.bottom) <= collision_tolerance and self.direction == (0, -1):
+                if abs(self.rect.top - platform.rect.bottom) <= COLLISION_TOLERANCE and self.direction == UP:
                     self.rect.top = platform.rect.bottom
-                if abs(self.rect.bottom - platform.rect.top) <= collision_tolerance and self.direction == (0, 1):
+                if abs(self.rect.bottom - platform.rect.top) <= COLLISION_TOLERANCE and self.direction == DOWN:
                     self.rect.bottom = platform.rect.top
-                if abs(self.rect.left - platform.rect.right) <= collision_tolerance and self.direction == (-1, 0):
+                if abs(self.rect.left - platform.rect.right) <= COLLISION_TOLERANCE and self.direction == LEFT:
                     self.rect.left = platform.rect.right
-                if abs(self.rect.right - platform.rect.left) <= collision_tolerance and self.direction == (1, 0):
+                if abs(self.rect.right - platform.rect.left) <= COLLISION_TOLERANCE and self.direction == RIGHT:
                     self.rect.right = platform.rect.left
 
 
+def main():
+    #set up
+    ball = Ball(screen_rect.width/2, screen_rect.height/2,5)
 
-#set up
-ball = Ball(screen_rect.width/2, screen_rect.height/2,5)
-platforms = [
-        Platform(50, screen_rect.height // 2, 10, 100, {pygame.K_w: (0, -1), pygame.K_s: (0, 1)}),
-        Platform(screen_rect.width - 50, screen_rect.height // 2, 10, 100, {pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}),
-        Platform(screen_rect.width // 2, 50, 100, 10, {pygame.K_a: (-1, 0), pygame.K_d: (1, 0)}),
-        Platform(screen_rect.width // 2, screen_rect.height - 50, 100, 10, {pygame.K_LEFT: (-1, 0), pygame.K_RIGHT: (1, 0)}),
-]
+    gap = 100
+    platforms = [
+            Platform(gap, screen_rect.height // 2, 10, 100, {pygame.K_w: UP, pygame.K_s: DOWN}),
+            Platform(screen_rect.width - gap, screen_rect.height // 2, 10, 100, {pygame.K_UP: UP, pygame.K_DOWN: DOWN}),
+            Platform(screen_rect.width // 2, gap, 100, 10, {pygame.K_a: LEFT, pygame.K_d: RIGHT}),
+            Platform(screen_rect.width // 2, screen_rect.height - gap, 100, 10, {pygame.K_LEFT: LEFT, pygame.K_RIGHT: RIGHT}),
+    ]
 
 
-while True:
-    screen.fill(0x000000)
-    for event in pygame.event.get(): # poll for events, pygame.QUIT event means the user clicked X to close your window
-        if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            pygame.quit()
-            sys.exit()
+    while True:
+        screen.fill(0x000000)
+        for event in pygame.event.get(): # poll for events, pygame.QUIT event means the user clicked X to close your window
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                sys.exit()
 
-    # RENDER YOUR GAME HERE
-    ball.move()
-    ball.check_collision()
-    ball.render()
+        # RENDER YOUR GAME HERE
+        for platform in platforms:
+            platform.control()
+            platform.move()
+            platform.check_collision(platforms)
+            platform.render()
 
-    for platform in platforms:
-        platform.control()
-        platform.move()
-        platform.check_collision()
-        platform.render()
-    
+        ball.move()
+        ball.check_collision(platforms)
+        ball.render()
 
-    # flip() the display to put your work on screen
-    pygame.display.flip()
+        
 
-    clock.tick(60)  # limits FPS to 60
+        # flip() the display to put your work on screen
+        pygame.display.flip()
+
+        clock.tick(60)  # limits FPS to 60
+
+if __name__ == "__main__":
+    pygame.init()
+    screen_size = (1000, 1000)
+    screen = pygame.display.set_mode(screen_size)
+    screen_rect = screen.get_rect()
+    clock = pygame.time.Clock()
+    COLLISION_TOLERANCE = 10
+    UP = pygame.Vector2(0, -1)
+    DOWN = pygame.Vector2(0, 1)
+    LEFT = pygame.Vector2(-1, 0)
+    RIGHT = pygame.Vector2(1, 0)
+    main()
