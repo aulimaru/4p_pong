@@ -15,7 +15,7 @@ class Ball():
     def render(self):
         pygame.draw.rect(screen, "white", self.rect) # draw the ball on screen
 
-    def check_collision(self, platforms):
+    def check_collision(self):
         if self.rect.top < screen_rect.top or self.rect.bottom > screen_rect.bottom or self.rect.left < screen_rect.left or self.rect.right > screen_rect.right:
             if self.owner is not None:
                 self.owner.score += 1
@@ -23,7 +23,7 @@ class Ball():
 
 
         for platform in platforms:
-            if platform.rect.colliderect(self.rect):
+            if self.rect.colliderect(platform.rect):
                 if abs(self.rect.top - platform.rect.bottom) <= COLLISION_TOLERANCE and self.velocity.y < 0:
                     self.velocity.reflect_ip(DOWN)
                 if abs(self.rect.bottom - platform.rect.top) <= COLLISION_TOLERANCE and self.velocity.y > 0:
@@ -60,7 +60,7 @@ class Platform():
         # moves platform according to direction
         self.rect.move_ip(self.direction * self.speed)
 
-    def check_collision(self, platforms):
+    def check_collision(self):
         # prevent the platform from going outside screen
         if self.rect.top < screen_rect.top:
             self.rect.top = screen_rect.top
@@ -86,7 +86,7 @@ class Platform():
 
 def main():
     #set up
-    ball = Ball(screen_rect.width/2, screen_rect.height/2,5)
+    ball = Ball(screen_rect.width // 2, screen_rect.height // 2, 5)
 
     platforms[0].rect.center = (GAP, screen_rect.height // 2)
     platforms[1].rect.center = (screen_rect.width - GAP, screen_rect.height // 2)
@@ -105,11 +105,11 @@ def main():
         for platform in platforms:
             platform.control()
             platform.move()
-            platform.check_collision(platforms)
+            platform.check_collision()
             platform.render()
 
         ball.move()
-        ball.check_collision(platforms)
+        ball.check_collision()
         ball.render()
 
 
