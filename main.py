@@ -12,7 +12,7 @@ class Ball():
         self.rect.move_ip(self.velocity)
 
     def render(self):
-        pygame.draw.rect(screen, 0xffffff, self.rect) # draw the ball on screen
+        pygame.draw.rect(screen, "white", self.rect) # draw the ball on screen
 
     def check_collision(self, platforms):
         if self.rect.top < screen_rect.top or self.rect.bottom > screen_rect.bottom or self.rect.left < screen_rect.left or self.rect.right > screen_rect.right:
@@ -39,7 +39,7 @@ class Platform():
         self.speed = 10
 
     def render(self):
-        pygame.draw.rect(screen, 0xffffff, self.rect)
+        pygame.draw.rect(screen, "white", self.rect)
 
     def control(self):
         # sets direction when key pressed
@@ -91,7 +91,7 @@ def main():
 
 
     while True:
-        screen.fill(0x000000)
+        screen.fill("black")
         for event in pygame.event.get(): # poll for events, pygame.QUIT event means the user clicked X to close your window
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pygame.quit()
