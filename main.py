@@ -15,13 +15,22 @@ class Ball():
     def render(self):
         pygame.draw.rect(screen, "white", self.rect) # draw the ball on screen
 
+    def check_outside(self):
+        if screen_rect.contains(self.rect):
+            return
+        if self.owner is not None:
+            self.owner.score += 1
+        if self.rect.top < screen_rect.top:
+            platforms[0].score -= 1
+        if self.rect.bottom > screen_rect.bottom:
+            platforms[1].score -= 1
+        if self.rect.left < screen_rect.left:
+            platforms[2].score -= 1
+        if self.rect.right > screen_rect.right:
+            platforms[3].score -= 1
+        main()
+
     def check_collision(self):
-        if self.rect.top < screen_rect.top or self.rect.bottom > screen_rect.bottom or self.rect.left < screen_rect.left or self.rect.right > screen_rect.right:
-            if self.owner is not None:
-                self.owner.score += 1
-            main()
-
-
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
                 if abs(self.rect.top - platform.rect.bottom) <= COLLISION_TOLERANCE and self.velocity.y < 0:
@@ -88,10 +97,10 @@ def main():
     #set up
     ball = Ball(screen_rect.width // 2, screen_rect.height // 2, 5)
 
-    platforms[0].rect.center = (GAP, screen_rect.height // 2)
-    platforms[1].rect.center = (screen_rect.width - GAP, screen_rect.height // 2)
-    platforms[2].rect.center = (screen_rect.width // 2, GAP)
-    platforms[3].rect.center = (screen_rect.width // 2, screen_rect.height - GAP)
+    platforms[0].rect.center = (screen_rect.width // 2, GAP)
+    platforms[1].rect.center = (screen_rect.width // 2, screen_rect.height - GAP)
+    platforms[2].rect.center = (GAP, screen_rect.height // 2)
+    platforms[3].rect.center = (screen_rect.width - GAP, screen_rect.height // 2)
 
 
     while True:
@@ -110,6 +119,7 @@ def main():
 
         ball.move()
         ball.check_collision()
+        ball.check_outside()
         ball.render()
 
 
@@ -132,9 +142,9 @@ if __name__ == "__main__":
     RIGHT = pygame.Vector2(1, 0)
     GAP = 100
     platforms = [
-            Platform(GAP, screen_rect.height // 2, 10, 100, {pygame.K_w: UP, pygame.K_s: DOWN}),
-            Platform(screen_rect.width - GAP, screen_rect.height // 2, 10, 100, {pygame.K_UP: UP, pygame.K_DOWN: DOWN}),
             Platform(screen_rect.width // 2, GAP, 100, 10, {pygame.K_a: LEFT, pygame.K_d: RIGHT}),
             Platform(screen_rect.width // 2, screen_rect.height - GAP, 100, 10, {pygame.K_LEFT: LEFT, pygame.K_RIGHT: RIGHT}),
+            Platform(GAP, screen_rect.height // 2, 10, 100, {pygame.K_w: UP, pygame.K_s: DOWN}),
+            Platform(screen_rect.width - GAP, screen_rect.height // 2, 10, 100, {pygame.K_UP: UP, pygame.K_DOWN: DOWN}),
     ]
     main()
