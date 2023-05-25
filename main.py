@@ -48,7 +48,7 @@ class Platform():
         pressed_keys = pygame.key.get_pressed()
         for keymap in self.keymaps:
             if pressed_keys[keymap]:
-                self.direction = self.keymaps.get(keymap)
+                self.direction += self.keymaps.get(keymap)
     
     def move(self):
         # moves platform according to direction
@@ -109,7 +109,6 @@ def main():
         ball.check_collision(platforms)
         ball.render()
 
-        
 
         # flip() the display to put your work on screen
         pygame.display.flip()
