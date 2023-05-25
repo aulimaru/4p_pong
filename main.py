@@ -7,6 +7,7 @@ class Ball():
         self.rect = pygame.Rect(0, 0, length, length)
         self.rect.center = (x, y)
         self.velocity = pygame.math.Vector2(2, 5)
+        self.owner = None
 
     def move(self):
         self.rect.move_ip(self.velocity)
@@ -16,6 +17,8 @@ class Ball():
 
     def check_collision(self, platforms):
         if self.rect.top < screen_rect.top or self.rect.bottom > screen_rect.bottom or self.rect.left < screen_rect.left or self.rect.right > screen_rect.right:
+            if self.owner is not None:
+                self.owner.score += 1
             main()
 
 
@@ -29,6 +32,7 @@ class Ball():
                     self.velocity.reflect_ip(RIGHT)
                 if abs(self.rect.right - platform.rect.left) <= COLLISION_TOLERANCE and self.velocity.x > 0:
                     self.velocity.reflect_ip(LEFT)
+                self.owner = platform
 
 
 class Platform():
@@ -37,9 +41,12 @@ class Platform():
         self.rect.center = (x, y)
         self.keymaps = keymaps
         self.speed = 10
+        self.score = 0
 
     def render(self):
         pygame.draw.rect(screen, "white", self.rect)
+        text_surface = FONT.render(f"{self.score}", True, "white")
+        screen.blit(text_surface, self.rect.bottomright)
 
     def control(self):
         # sets direction when key pressed
@@ -81,13 +88,10 @@ def main():
     #set up
     ball = Ball(screen_rect.width/2, screen_rect.height/2,5)
 
-    gap = 100
-    platforms = [
-            Platform(gap, screen_rect.height // 2, 10, 100, {pygame.K_w: UP, pygame.K_s: DOWN}),
-            Platform(screen_rect.width - gap, screen_rect.height // 2, 10, 100, {pygame.K_UP: UP, pygame.K_DOWN: DOWN}),
-            Platform(screen_rect.width // 2, gap, 100, 10, {pygame.K_a: LEFT, pygame.K_d: RIGHT}),
-            Platform(screen_rect.width // 2, screen_rect.height - gap, 100, 10, {pygame.K_LEFT: LEFT, pygame.K_RIGHT: RIGHT}),
-    ]
+    platforms[0].rect.center = (GAP, screen_rect.height // 2)
+    platforms[1].rect.center = (screen_rect.width - GAP, screen_rect.height // 2)
+    platforms[2].rect.center = (screen_rect.width // 2, GAP)
+    platforms[3].rect.center = (screen_rect.width // 2, screen_rect.height - GAP)
 
 
     while True:
@@ -120,9 +124,17 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode(screen_size)
     screen_rect = screen.get_rect()
     clock = pygame.time.Clock()
+    FONT = pygame.font.SysFont("None", 24)
     COLLISION_TOLERANCE = 10
     UP = pygame.Vector2(0, -1)
     DOWN = pygame.Vector2(0, 1)
     LEFT = pygame.Vector2(-1, 0)
     RIGHT = pygame.Vector2(1, 0)
+    GAP = 100
+    platforms = [
+            Platform(GAP, screen_rect.height // 2, 10, 100, {pygame.K_w: UP, pygame.K_s: DOWN}),
+            Platform(screen_rect.width - GAP, screen_rect.height // 2, 10, 100, {pygame.K_UP: UP, pygame.K_DOWN: DOWN}),
+            Platform(screen_rect.width // 2, GAP, 100, 10, {pygame.K_a: LEFT, pygame.K_d: RIGHT}),
+            Platform(screen_rect.width // 2, screen_rect.height - GAP, 100, 10, {pygame.K_LEFT: LEFT, pygame.K_RIGHT: RIGHT}),
+    ]
     main()
