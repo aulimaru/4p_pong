@@ -21,15 +21,14 @@ class Ball():
 
         for platform in platforms:
             if platform.rect.colliderect(self.rect):
-                if abs(self.rect.top - platform.rect.bottom) <= COLLISION_TOLERANCE:
+                if abs(self.rect.top - platform.rect.bottom) <= COLLISION_TOLERANCE and self.velocity.y < 0:
                     self.velocity.reflect_ip(DOWN)
-                if abs(self.rect.bottom - platform.rect.top) <= COLLISION_TOLERANCE:
+                if abs(self.rect.bottom - platform.rect.top) <= COLLISION_TOLERANCE and self.velocity.y > 0:
                     self.velocity.reflect_ip(UP)
-                if abs(self.rect.left - platform.rect.right) <= COLLISION_TOLERANCE:
+                if abs(self.rect.left - platform.rect.right) <= COLLISION_TOLERANCE and self.velocity.x < 0:
                     self.velocity.reflect_ip(RIGHT)
-                if abs(self.rect.right - platform.rect.left) <= COLLISION_TOLERANCE:
+                if abs(self.rect.right - platform.rect.left) <= COLLISION_TOLERANCE and self.velocity.x > 0:
                     self.velocity.reflect_ip(LEFT)
-
 
 
 class Platform():
