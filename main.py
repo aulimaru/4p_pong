@@ -1,19 +1,27 @@
 import pygame
 import sys
-
+import math
 
 class Ball():
     def __init__(self, x, y, length):
         self.rect = pygame.Rect(0, 0, length, length)
+        self.length = length
         self.rect.center = (x, y)
-        self.velocity = pygame.math.Vector2(2, 5)
+        self.speed = 5
+        self.velocity = pygame.math.Vector2(3, 4)
+        self.accel = 0.02  # (0,1] smaller the value, slower the ac/deceleration, 1 will set speed to default always.
         self.owner = None
 
+    def vector_to_speed(self, x):
+        return math.sqrt(x.x**2+x.y**2)
     def move(self):
-        self.rect.move_ip(self.velocity)
+        self.rect.center += self.velocity
+        self.velocity /= (self.vector_to_speed(self.velocity) / self.speed - 1) * self.accel + 1  # deceleration
 
     def render(self):
-        pygame.draw.rect(screen, "white", self.rect) # draw the ball on screen
+        # pygame.draw.line(screen, "red", self.rect.center, self.velocity*999+self.rect.center)
+        # pygame.draw.line(screen, "green", self.rect.center, self.rect.center+self.velocity*10)  # the direction line and prediction line are bad because of int problem, but IDK how.
+        pygame.draw.rect(screen, "white", self.rect)  # draw the ball on screen
 
     def check_outside(self):
         if screen_rect.contains(self.rect):
@@ -35,12 +43,16 @@ class Ball():
             if self.rect.colliderect(platform.rect):
                 if abs(self.rect.top - platform.rect.bottom) <= COLLISION_TOLERANCE and self.velocity.y < 0:
                     self.velocity.reflect_ip(DOWN)
-                if abs(self.rect.bottom - platform.rect.top) <= COLLISION_TOLERANCE and self.velocity.y > 0:
+                    self.velocity+=platform.direction*platform.speed
+                elif abs(self.rect.bottom - platform.rect.top) <= COLLISION_TOLERANCE and self.velocity.y > 0:
                     self.velocity.reflect_ip(UP)
-                if abs(self.rect.left - platform.rect.right) <= COLLISION_TOLERANCE and self.velocity.x < 0:
+                    self.velocity += platform.direction * platform.speed
+                elif abs(self.rect.left - platform.rect.right) <= COLLISION_TOLERANCE and self.velocity.x < 0:
                     self.velocity.reflect_ip(RIGHT)
-                if abs(self.rect.right - platform.rect.left) <= COLLISION_TOLERANCE and self.velocity.x > 0:
+                    self.velocity += platform.direction * platform.speed
+                elif abs(self.rect.right - platform.rect.left) <= COLLISION_TOLERANCE and self.velocity.x > 0:
                     self.velocity.reflect_ip(LEFT)
+                    self.velocity += platform.direction * platform.speed
                 self.owner = platform
 
 
@@ -51,6 +63,7 @@ class Platform():
         self.keymaps = keymaps
         self.speed = 10
         self.score = 0
+        self.direction = pygame.Vector2(0, 0)
 
     def render(self):
         pygame.draw.rect(screen, "white", self.rect)
@@ -64,7 +77,7 @@ class Platform():
         for keymap in self.keymaps:
             if pressed_keys[keymap]:
                 self.direction += self.keymaps.get(keymap)
-    
+
     def move(self):
         # moves platform according to direction
         self.rect.move_ip(self.direction * self.speed)
@@ -113,8 +126,8 @@ def main():
         # RENDER YOUR GAME HERE
         for platform in platforms:
             platform.control()
-            platform.move()
             platform.check_collision()
+            platform.move()
             platform.render()
 
         ball.move()
