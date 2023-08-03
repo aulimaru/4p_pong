@@ -28,7 +28,7 @@ class Ball():
     def move(self):
         self.center += self.velocity
         self.rect.center=self.center
-        self.velocity /= (self.vector_to_speed(self.velocity) / self.speed - 1) * self.accel + 1  # deceleration
+        self.velocity /= (self.vector_to_speed(self.velocity) / self.speed - 1) * self.accel + 1  # de/acceleration
 
     def render(self):
         pygame.draw.line(screen, "red", self.rect.center, self.velocity*1024+self.rect.center)
@@ -84,7 +84,7 @@ class Platform():
         screen.blit(text_surface, self.rect.bottomright)
 
     #  Algorithms
-    def manual(self):
+    def alg_manual(self):
         # sets direction when key pressed
         direction = pygame.Vector2(0, 0)
         pressed_keys = pygame.key.get_pressed()
@@ -93,13 +93,13 @@ class Platform():
                 direction += self.keymaps.get(keymap)
         return direction
 
-    def chaseball(self):
+    def alg_chaseball(self):
         pass  # I can't fucking do this, so hard
 
     def control(self):
         match self.algorithm:
             case "manual":
-                self.direction = self.manual()
+                self.direction = self.alg_manual()
 
     def move(self):
         # moves platform according to direction
