@@ -1,3 +1,5 @@
 /.idea
 /venv
-/aulimaru_own
+/BigData
+/Pipfile
+/Pipfile.lock
